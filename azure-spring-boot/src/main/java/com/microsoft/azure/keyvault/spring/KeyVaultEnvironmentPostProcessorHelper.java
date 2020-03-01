@@ -53,7 +53,12 @@ class KeyVaultEnvironmentPostProcessorHelper {
         final Binder binder = Binder.get(this.environment);
         final List<String> secretKeys = binder.bind(Constants.AZURE_KEYVAULT_SECRET_KEYS, Bindable.listOf(String.class))
                 .orElse(Collections.emptyList());
-
+        
+        //Added for file container based ket values..
+        final List<String> secretKeysContainer = binder.bind(Constants.AZURE_KEYVAULT_SECRET_KEYS_FILE, 
+        Bindable.listOf(String.class))
+                .orElse(Collections.emptyList());
+        
         final TokenCredential tokenCredential = getCredentials();
         final SecretClient secretClient = new SecretClientBuilder()
                 .vaultUrl(vaultUri)
@@ -64,7 +69,8 @@ class KeyVaultEnvironmentPostProcessorHelper {
             final KeyVaultOperation kvOperation = new KeyVaultOperation(secretClient,
                     vaultUri,
                     refreshInterval,
-                    secretKeys);
+                    secretKeys,
+                    secretKeysContainer);
 
             if (sources.contains(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME)) {
                 sources.addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
@@ -83,7 +89,6 @@ class KeyVaultEnvironmentPostProcessorHelper {
         if (this.environment.containsProperty(Constants.AZURE_KEYVAULT_CLIENT_ID)
                 && this.environment.containsProperty(Constants.AZURE_KEYVAULT_CLIENT_KEY)
                 && this.environment.containsProperty(Constants.AZURE_KEYVAULT_TENANT_ID)) {
-            log.debug("Will use custom credentials");
             final String clientId = getProperty(this.environment, Constants.AZURE_KEYVAULT_CLIENT_ID);
             final String clientKey = getProperty(this.environment, Constants.AZURE_KEYVAULT_CLIENT_KEY);
             final String tenantId = getProperty(this.environment, Constants.AZURE_KEYVAULT_TENANT_ID);
@@ -118,11 +123,11 @@ class KeyVaultEnvironmentPostProcessorHelper {
         }
         //use MSI to authenticate
         if (this.environment.containsProperty(Constants.AZURE_KEYVAULT_CLIENT_ID)) {
-            log.debug("Will use MSI credentials with specified clientId");
+           // log.debug("Will use MSI credentials with specified clientId");
             final String clientId = getProperty(this.environment, Constants.AZURE_KEYVAULT_CLIENT_ID);
             return new ManagedIdentityCredentialBuilder().clientId(clientId).build();
         }
-        log.debug("Will use MSI credentials");
+        //log.debug("Will use MSI credentials");
         return new ManagedIdentityCredentialBuilder().build();
     }
 

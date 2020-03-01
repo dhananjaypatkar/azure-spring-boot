@@ -5,23 +5,25 @@
  */
 package com.microsoft.azure.keyvault.spring;
 
-import com.azure.core.http.rest.PagedFlux;
-import com.azure.core.http.rest.PagedIterable;
-import com.azure.security.keyvault.secrets.SecretClient;
-import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
-import com.azure.security.keyvault.secrets.models.SecretProperties;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import com.azure.core.http.rest.PagedFlux;
+import com.azure.core.http.rest.PagedIterable;
+import com.azure.security.keyvault.secrets.SecretClient;
+import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
+import com.azure.security.keyvault.secrets.models.SecretProperties;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KeyVaultOperationUnitTest {
@@ -63,7 +65,8 @@ public class KeyVaultOperationUnitTest {
         keyVaultOperation = new KeyVaultOperation(keyVaultClient,
                 fakeVaultUri,
                 Constants.TOKEN_ACQUIRE_TIMEOUT_SECS,
-                secretKeysConfig);
+                secretKeysConfig, 
+                Collections.emptyList());
     }
 
     @Test
